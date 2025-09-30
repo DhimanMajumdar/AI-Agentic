@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 import requests
+from pydantic import BaseModel, Field
+from typing import Optional
 
 load_dotenv()
 
@@ -46,6 +48,21 @@ AVAILABLE TOOLS:
 # ------------------- MAIN LOOP -------------------
 print("\n\n\n")
 
+
+class MyOutputFormat(BaseModel):
+    step: str = Field(
+        ...,
+        description="The ID of the step.Example: PLAN, OUTPUT,TOOL,etc",
+    )
+    content: Optional[str] = Field(
+        default=None, description="The optional string content for the step."
+    )
+    tool: Optional[str] = Field(default=None, description="The ID of the tool called.")
+    input: Optional[str] = Field(
+        default=None, description="The input params for the tool"
+    )
+
+
 message_history = [
     {"role": "system", "content": SYSTEM_PROMPT},
 ]
@@ -55,34 +72,34 @@ while True:
     message_history.append({"role": "user", "content": user_query})
 
     for _ in range(20):  # safety cap
-        response = client.chat.completions.create(
+        response = client.chat.completions.parse(
             model="gpt-4o-mini",
-            response_format={"type": "json_object"},
+            response_format=MyOutputFormat,
             messages=message_history,
         )
         raw_result = response.choices[0].message.content
 
         try:
-            parsed_result = json.loads(raw_result)
+            parsed_result = response.choices[0].message.parsed
         except json.JSONDecodeError:
             print("⚠️ Model returned invalid JSON:", raw_result)
             break
 
         message_history.append({"role": "assistant", "content": raw_result})
 
-        step = parsed_result.get("step")
+        step = parsed_result.step
 
         if step == "START":
-            print("🔥", parsed_result.get("content"))
+            print("🔥", parsed_result.content)
             continue
 
         if step == "PLAN":
-            print("🧠", parsed_result.get("content"))
+            print("🧠", parsed_result.content)
             continue
 
         if step == "TOOL":
-            tool_to_call = parsed_result.get("tool")
-            tool_input = parsed_result.get("input")
+            tool_to_call = parsed_result.tool
+            tool_input = parsed_result.input
             print(f"🔪 Calling tool: {tool_to_call}({tool_input})")
 
             tool_response = available_tools[tool_to_call](tool_input)
@@ -104,11 +121,11 @@ while True:
             continue
 
         if step == "OBSERVE":
-            print("👀 Observation:", parsed_result.get("output"))
+            print("👀 Observation:", parsed_result.output)
             continue
 
         if step == "OUTPUT":
-            print("🔳", parsed_result.get("content"))
+            print("🔳", parsed_result.content)
             break
 
 print("\n\n\n")
