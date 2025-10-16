@@ -35,7 +35,6 @@ PLAN: { "step": "PLAN": "content": "Great, we have solved and finally left with 
 OUTPUT: { "step": "OUTPUT": "content": "3.5" }
 """
 
-print("\n\n\n")
 
 message_history = [
     {"role": "system", "content": SYSTEM_PROMPT},
@@ -66,9 +65,6 @@ while True:
     if parsed_result.get("step") == "OUTPUT":
         print("🔳", parsed_result.get("content"))
         break
-
-
-print("\n\n\n")
 
 
 # response = client.chat.completions.create(
