@@ -3,8 +3,25 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import os
 import json
+import sys
 import warnings
+
+import typing
+if not hasattr(typing, "Optional"):
+    from typing import Any
+    typing.Optional = lambda x: x  # crude no-op fallback
+    typing._Optional = typing.Optional
+
+
+# Suppress deprecation warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+# Temporarily disable type checking for Python 3.14
+if sys.version_info >= (3, 14):
+    import typing
+    typing.TYPE_CHECKING = False
+
 
 
 print("Loading environment...")
@@ -24,6 +41,14 @@ config = {
     "llm": {
         "provider": "openai",
         "config": {"api_key": OPENAI_API_KEY, "model": "gpt-4.1"}
+    },
+    "graph_store":{
+        "provider":"neo4j",
+        "config":{
+            "url":"neo4j+s://726025c0.databases.neo4j.io",
+            "username":"neo4j",
+            "password":"ABRwVBCRpNgzHLuKvPDlYgjXKjNHhhdw3vlJugEC3fU"
+        }
     },
     "vector_store": {
         "provider": "qdrant",
