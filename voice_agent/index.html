@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Black Theme To-Do App</title>
+    <style>
+      body {
+        background: #181818;
+        color: #f5f5f5;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 0;
+      }
+      .todo-container {
+        background: #222;
+        border-radius: 12px;
+        padding: 32px;
+        min-width: 350px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+        margin-top: 60px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .input-group input {
+        flex: 1;
+        padding: 12px;
+        background: #333;
+        color: #f5f5f5;
+        border: none;
+        border-radius: 4px;
+        outline: none;
+        font-size: 16px;
+      }
+      .input-group button {
+        background: #1e90ff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+      .input-group button:hover {
+        background: #156fc1;
+      }
+      ul#todo-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      .todo-item {
+        background: #232323;
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #f5f5f5;
+        transition: background 0.2s;
+      }
+      .todo-item.completed {
+        text-decoration: line-through;
+        color: #888;
+        background: #151515;
+      }
+      .delete-btn {
+        background: #ff4040;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 11px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-left: 10px;
+        transition: background 0.2s;
+      }
+      .delete-btn:hover {
+        background: #c92626;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="todo-container">
+      <h2>📝 Black Theme To-Do</h2>
+      <div class="input-group">
+        <input type="text" id="todo-input" placeholder="Add a new task..." />
+        <button id="add-btn">Add</button>
+      </div>
+      <ul id="todo-list"></ul>
+    </div>
+    <script>
+      const input = document.getElementById("todo-input");
+      const addBtn = document.getElementById("add-btn");
+      const todoList = document.getElementById("todo-list");
+
+      function createTodoItem(text) {
+        const li = document.createElement("li");
+        li.className = "todo-item";
+        li.innerHTML = `
+    <span>${text}</span>
+    <button class="delete-btn">Delete</button>
+  `;
+        // Toggle complete
+        li.querySelector("span").onclick = function () {
+          li.classList.toggle("completed");
+        };
+        // Delete
+        li.querySelector(".delete-btn").onclick = function () {
+          li.remove();
+        };
+        return li;
+      }
+
+      function addTodo() {
+        const text = input.value.trim();
+        if (text) {
+          const li = createTodoItem(text);
+          todoList.appendChild(li);
+          input.value = "";
+          input.focus();
+        }
+      }
+
+      addBtn.onclick = addTodo;
+      input.addEventListener("keypress", function (evt) {
+        if (evt.key === "Enter") {
+          addTodo();
+        }
+      });
+    </script>
+  </body>
+</html>
